@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify-like Audio Player</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ececec; /* Light gray background for the whole page */
+        }
+
+        .audio-card {
+            width: 300px;
+            background-color: #b58676; /* Background color for the player card */
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            color: white;
+            position: relative;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .audio-card img.cover {
+            width: 100%;
+            border-radius: 12px;
+            height: auto;
+        }
+
+        .spotify-logo {
+            position: absolute;
+            top: -15px; /* Moves the Spotify logo outside the cover */
+            right: 15px;
+            width: 25px;
+            height: 25px;
+        }
+
+        .audio-card h4 {
+            font-size: 18px;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        .audio-card p {
+            font-size: 14px;
+            color: #f1f1f1;
+        }
+
+        .progress-bar {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            background-color: #e0e0e0;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            background-color: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .audio-controls .play-pause {
+            width: 50px;
+            height: 50px;
+            background-color: transparent; /* Transparent background for play button */
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: none; /* Remove shadow */
+        }
+
+        .audio-controls .play-pause img {
+            width: 50px; /* Set image width to 50px */
+            height: 50px; /* Set image height to 50px */
+        }
+
+        .audio-controls .time {
+            font-size: 12px;
+            color: #f1f1f1;
+        }
+
+        .time-duration {
+            text-align: center;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="audio-card">
+    <img class="cover" src="cover2.png" alt="Track Cover">
+    
+    <h4>Podcast Title</h4>
+    <p>Group 7</p>
+    <div class="progress-bar">
+        <input type="range" id="seek-bar" value="0" min="0" max="100">
+    </div>
+
+    <div class="audio-controls">
+        <div class="time" id="current-time">0:00</div>
+        <button class="play-pause" id="play-pause">
+            <img id="play-icon" src="play.png" alt="Play Icon" />
+            <img id="pause-icon" src="pause.png" alt="Pause Icon" style="display: none;" />
+        </button>
+        <div class="time" id="duration">-0:00</div>
+    </div>
+
+    <audio id="audio" src="audio.mp4"></audio>
+</div>
+
+<script>
+    const audio = document.getElementById('audio');
+    const playPauseButton = document.getElementById('play-pause');
+    const playIcon = document.getElementById('play-icon');
+    const pauseIcon = document.getElementById('pause-icon');
+    const seekBar = document.getElementById('seek-bar');
+    const currentTimeDisplay = document.getElementById('current-time');
+    const durationDisplay = document.getElementById('duration');
+
+    // Play/Pause toggle
+    playPauseButton.addEventListener('click', function () {
+        if (audio.paused) {
+            audio.play();
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+        } else {
+            audio.pause();
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+        }
+    });
+
+    // Update seek bar and time
+    audio.addEventListener('timeupdate', function () {
+        const value = (audio.currentTime / audio.duration) * 100;
+        seekBar.value = value || 0;
+
+        currentTimeDisplay.textContent = formatTime(audio.currentTime);
+        durationDisplay.textContent = '-' + formatTime(audio.duration - audio.currentTime);
+    });
+
+    // Seek functionality
+    seekBar.addEventListener('input', function () {
+        const seekTo = (seekBar.value / 100) * audio.duration;
+        audio.currentTime = seekTo;
+    });
+
+    // Format time in minutes:seconds
+    function formatTime(seconds) {
+        const min = Math.floor(seconds / 60);
+        const sec = Math.floor(seconds % 60);
+        return min + ':' + (sec < 10 ? '0' + sec : sec);
+    }
+
+    // Load duration when metadata is loaded
+    audio.addEventListener('loadedmetadata', function () {
+        durationDisplay.textContent = '-' + formatTime(audio.duration);
+    });
+</script>
+
+</body>
+</html>
